@@ -1,0 +1,3 @@
+[submodule "lecture-notes-template"]
+	path = lecture-notes-template
+	url = https://github.com/xnhp/lecture-notes-template/
