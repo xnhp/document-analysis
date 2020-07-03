@@ -183,18 +183,95 @@ context in the sentence.
   -- good to tailor solution to very specific problems
 \end{itemize}
 
-\paragraph{\ila{Unigram Tagger} } Assign a token $w$ its most frequent tag, i.e.
+\subsection{Probabilistic tagging}
+
+Consider the definition of \ild{ conditional probability }
+\begin{align*}
+  P(A|B) = \frac{P(A,B)}{P(B)} 
+\end{align*}
+This gives rise to the \ild{chain rule}
+\begin{align*}
+  \Rightarrow P(A,B) = P(A|B) \cdot P(B)
+\end{align*}
+or, more generally
+\begin{align*}
+  P(w_1, ..., w_n) = \prod P(w_i~|~w_1, ..., w_{i-1})
+\end{align*}
+The problem here is that we cannot realistically obtain all the components of
+the product because there are way too many possible sequences of words. Instead,
+we employ the \ild{Markov assumption} that says that we can estimate the
+probabilities by only consiering only the $k$ preceding terms
+\begin{align*}
+  P(w_i ~|~ w_1 ..., w_{i-1}) \approx P(w_i ~|~ w_{i-k}, ..., w_{i-1})
+\end{align*}
+
+For $k=1$, this yields the \ild{unigram model}, for $k=2$ the \ild{bigram model}
+(i.e. $P(w_i | w_{i-1})$).
+
+$n$-gram modelling is insufficient because language has \textit{long-distance depenencies}.
+
+\paragraph{\ila{Unigram Tagger} } Assume that a unigram model generates the
+current tagging. 
+
+Assign a token $w$ its most frequent tag, i.e.
 \begin{align*}
   t(w) := \argmax_t P(t~|~w)
 \end{align*}
-Improvement: Use Bayes' formula
+\textit{Improvement}: Use Bayes' formula, i.e. $P(A|B) = \frac{P(B|A)P(B)}{P(B)}$,
+omitting the quotient:
 \begin{align*}
   t(w) := P(t~|~w) = \argmax_t P(t) \cdot P(w~|~t)
 \end{align*}
-(omitting the quotient)
 
-\paragraph{\ila{$n$-gram tagger} } ...
+\paragraph{\textit{ \todo }} example
 
+\paragraph{\ila{$n$-gram tagger} } Use information about the previous $n$
+tokens in addition to information about current token. Can have \ild{word-based}
+and \ild{tag-based} (tags are more common, training data covers more ground).
+
+Assume a bigram language model (generating the sequence of POS-tags).
+
+Pick the tag $t_i$ for word $w_i$ that maximises
+\begin{align*}
+  P(t_i ~|~ t_{i-1}) \cdot P(w_i~|~t_{i-1})
+\end{align*}
+
+For finding $P(t_i~|~t_{i-1})$, use the \ild{Maximum Likelihood Estimate} (where
+$c$ is the count of observations)
+\begin{align*}
+  P(t_i | t_{i-1}) \approx \frac{c(w_{i-1}, w_i)}{c(w_{i-1})}
+\end{align*}
+\iln{(Use start and end symbols to be able to calculate probs for first and last
+  words)}
+
+% For $n=2$, can imagine a twodimensional lookup table:
+% \begin{align*}
+%   \text{previously seen POS-tag} \times \text{current word} \rightarrow 
+% \end{align*}
+
+\paragraph{\textit{\todo}} example
+
+
+\subsection{Rule-based tagging}
+
+Try to incorporate linguistic insight.
+
+\paragraph{\ila{Brill tagger} }
+\begin{enumerate}
+\item Tag each word using a \ild{ baseline tagger } (e.g. unigram tagger, i.e.
+  most common tag)
+\item Apply patches that improve the result
+  \begin{itemize}
+  \item e.g. \textit{if one of the two preceding words is a determiner, change
+      the tag from verb to noun}
+  \item Based on training data, compute the error between any two
+    should-be/is-assigned: $(t_a, t_b, \mathit{freq})$.
+  \item For each error triple, apply the patch that results in the greatest
+    improvement, apply it.
+  \item Repeat until no further improvement is possible.
+  \end{itemize}
+
+\end{enumerate}
 
 
 
