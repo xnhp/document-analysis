@@ -325,6 +325,46 @@ are the \textit{rhs} of a production rule. The topmost cell produces the entire 
 \end{figure}
 Note that this finds all possible parse trees.
 
+\subsection{Statistical Parsing}
+
+\textit{Motivation: Sentences can have many different parse trees but some are
+  clearly more likely than others.}
+
+\paragraph{\textit{Basic idea}}
+\begin{itemize}
+\item Associate rules of a grammar with probabilities
+\item The probability of a parse tree is the product of all used
+  productions/derivations.
+\item Probability of a sentence is the sum of all possible parse tree
+  probablities.
+\item Probabilities can be learned from a training corpus.
+\item Can use probabilites in parsing algorithms such as the CYK parser to find
+  the most likely parse tree.
+\end{itemize}
+
+\paragraph{\ild{Lexicalised Parsing}} Extend production rules to be specific to
+terms (e.g. \textit{VP(ate)  $\rightarrow$ VP(ate) PP(with)}). Then, again,
+assign/learn probabilities. \todo Head of sentence
+
+\subsection{Dependency Parsing}
+
+\paragraph{\textit{Basic concept}} Dependencies (in the linguistic sense)
+between tokens (such as \textit{determiner, subject, ...}), these form a tree.
+Again, want to find the most likely parse/dependency structure
+
+\paragraph{\ila{Constraint-based Parsing} } Come up with rules describing what a
+dependency can possibly look like. Begin with a complete graph of pairwise
+dependencies, then iteratively eliminate dependencies according to rules.
+
+\paragraph{\ila{Global linear models} } Assign a \ild{local feature vector}
+$g(x,h,m)$ to a specific dependency $(h,m)$ in a specific sentence $x$. Try to
+maximise the (weighted) sum of all depenencies in the sentence, i.e. the best
+parse $y = F(x)$ is given by
+\begin{align*}
+  F(X) = \argmax_y \vec w \cdot \sum_{(h,m)\in y} g(x,h,m)
+\end{align*}
+
+
 
 
 \pagebreak
