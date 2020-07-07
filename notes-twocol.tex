@@ -277,6 +277,56 @@ Try to incorporate linguistic insight.
 
 \section{Parsing}
 
+\textit{We try to determine the grammatical structure of a sentence.}
+
+\paragraph{\ild{Parsing problem}} Identify the parse tree (w.r.t some grammar)
+for a given sentence. \iln{(There may be multiple parse trees, or none.)}
+
+\paragraph{\ild{Parse tree}} depicts derivation of sentence beginning from start
+symbol. Obviously requires context-free grammar \iln{(each set of children has
+  exactly one parent)}
+
+\paragraph{\textit{Motivation}}
+\begin{itemize}
+\item Grammar checking
+\item Question answering
+\item Machine translation
+\item ...
+\end{itemize}
+
+\subsection{Constituency parsing}
+
+\paragraph{\textit{Basic assumption}} Language is made up of \ild{constituents},
+i.e. basic, nested building blocks \iln{(terminals and nonterminals of a formal grammar.)}
+
+\paragraph{\ila{Leftmost derivation}} Always expand the leftmost expandable
+nonterminal.
+
+\paragraph{\ila{Shift-reduce parser}} \textit{(bottom-up approach)} Push tokens
+onto stack until top of stack matches the \textit{rhs} of a rule, then reduce
+(on stack). Accepts the word if start symbol alone is left on the stack.
+
+\paragraph{\ild{Chomsky normal form}} The \textit{rhs} of a rule is of one of
+these shapes
+\begin{itemize}
+\item $A \rightarrow BC$
+\item $A \rightarrow a$
+\item $S \rightarrow \varepsilon$
+\end{itemize}
+
+
+\paragraph{\ila{CYK Parser} } \textit{(dynamic programming, bottom-up)} Assumes
+a grammar in CNF, i.e. \textit{rhs} of rules is two nonterminals or a terminal.
+From the bottom up, in a dynamic programming fashion, remember if two subcells
+are the \textit{rhs} of a production rule. The topmost cell produces the entire sentence.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\linewidth]{cyk-parsing}
+\end{figure}
+Note that this finds all possible parse trees.
+
+
+
 \pagebreak
 \part{Similarity Measures}
 
@@ -323,7 +373,7 @@ them (e.g. triples of operators \textit{is-a}, \textit{daughter-of}, ...)
   \textsc{Rdf}-triples)}.
 
 \paragraph{\textit{Relationship Extraction}} Try to find type of relationship
-between two entitties. Possibilities
+between two entities. Possibilities
 \begin{itemize}
 \item Extract \textsc{Rdf} triples from large corpora like Wikipedia
 \item Use (specialised) ontologies / knowledge bases (for ex. medical applications)
