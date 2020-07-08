@@ -365,10 +365,91 @@ parse $y = F(x)$ is given by
 \end{align*}
 
 
-
-
 \pagebreak
 \part{Similarity Measures}
+
+\textit{As there are many different expressions for the same semantic concept,
+  we want to derive concepts of similarity between words. Further, this is
+  useful in spelling correction.}
+
+\section{Word similarity}
+
+\paragraph{\ild{Phonological similarity}} How much do two words sound alike?
+
+\paragraph{\ila{Soundex} } Reduce a given term/word into a phonetic
+representation based on rules.
+
+\paragraph{\ild{Morphological similarity}} basically comes down to stemming.
+
+\paragraph{\ild{Spelling similarity}} Mainly want to identify spelling errors
+
+\paragraph{\ila{Levenshtein distance / edit distance}} (\textit{dynamic
+  programming}) We already know this. Extensions: Cost matrices, based for
+example on distance of letters on keyboard.
+
+\paragraph{\ild{Semantic similarity}} 
+\begin{itemize}
+\item \ild{Synonym} -- same meaning. A \ild{synset} is the equivalence class of synonymity.
+\item \ild{Antonym} -- opposite meaning
+\item \ild{hypernym} -- more general meaning
+\item \ild{hyponym} -- more specific
+\item \ild{meronym} -- part of collective
+\end{itemize}
+
+\paragraph{\ila{WordNet}} provides a tree (forest) of semantic relationships
+between words. Similarity between $v,w$ can then be defined e.g. \todo
+
+
+\section{Document similarity}
+
+\paragraph{\ild{Vector space model}} See IR lecture notes.
+
+\paragraph{\ild{tf-idf weight}} \begin{itemize}
+\item \ild{term frequency $\mathit{tf}(t,d)$} --- How often does term $t$ appear in
+  document $d$? Commonly dampened by logarithm.
+\item \ild{document frequency $\mathit{df}(t)$} --- In how many documents does $t$ appear?
+\item \ild{inverse document frequency $\mathit{idf}(t)$}  ---
+  The basic idea: Rare terms are more informative
+  than frequent terms and should thus receive a high score.  Thus we do the
+  inverse fraction and log-dampening:
+  \begin{align*}
+    \mathit{idf}(t) := \log \frac{n}{\mathit{df}(t)}
+  \end{align*}
+\end{itemize}
+The tf-idf weight is given by the product of term frequency and inverse document
+frequency:
+\begin{align*}
+  \mathit{tf.idf}(t,d) = \log(1 + \mathit{tf}(td)) \cdot \log \left( \frac{n}{\mathit{df}(t)} \right)
+\end{align*}
+\begin{itemize}
+\item term frequency increases with the number of occurences in the document
+\item inverse document frequency increases with the rarity of the term in the collection
+\end{itemize}
+
+The score for a multi-term query and a document is
+\begin{align*}
+  \mathit{score}(q,d) := \sum_{t \in q \cap d} \mathit{tf.idf}(t,d)
+\end{align*}
+Problems:
+\begin{itemize}
+\item Bag-of-words model, does not consider order
+\item Score is a sum, longer documents receive higher score
+\end{itemize}
+
+\paragraph{\ild{Vector space model}} Each document is a vector consisting of
+tf-idf weights of terms. \ild{Distance measure}:
+\begin{itemize}
+\item euclidean distance is not suited because it considers the lengths (norms)
+  of vectors, but we only really care about the distribution of terms
+\item hence use \ild{cosine similarity}, which measures the angle between vectors.
+\end{itemize}
+
+
+
+
+
+
+
 
 \pagebreak
 \part{Language Modelling}
