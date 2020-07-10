@@ -445,14 +445,100 @@ tf-idf weights of terms. \ild{Distance measure}:
 \end{itemize}
 
 
-
-
-
-
-
-
 \pagebreak
 \part{Language Modelling}
+
+\paragraph{\ild{Basic pipeline}}
+\begin{enumerate}
+\item Corpus
+\item high-dimensional vector space
+\item latent space (word embedings)
+\item word relationships
+\end{enumerate}
+
+
+\paragraph{\ild{Word embedding}} Encode some notion of similarity to other words
+in a vector. Motivation: Approaches like WordNet are static and thus
+insufficient. Possible information
+\begin{itemize}
+\item syntactic similarity (\textit{run, ran})
+\item semantic similarity (\textit{large, big})
+\item relatedness (\textit{coffee, cup})
+\end{itemize}
+
+\paragraph{\ild{Word context matrix}} (\textit{co-occurence matrix})
+\begin{itemize}
+\item Each row represents a word
+\item Each column represents some ``context'' (specific entity or other word)
+\item cell represents the strengh of association, for example \textit{pointwise
+    mutual information}
+\end{itemize}
+This matrix is very sparse. We'd like to find a low-dimensional
+representation of our word vector (word embedding). We project into a
+lower-dimensional space, the so-called \ild{latent space}.
+
+\paragraph{\ila{Word2Vec}} \textit{(neural network for learning word vectors,
+  context-independent model)}
+Given a training corpus, every word in a fixed vocabulary is represented by a vector.
+\begin{enumerate}
+\item For each center word $c$ and a context window of fixed size $o$...
+\item use the word vector similarity of $c$ and $o$ to calculate $P(o|c)$ (or
+  $P(c|o)$, see below)
+\item Adjust word vector to maximise predictive accuracy
+\end{enumerate}
+\begin{itemize}
+\item \ild{Continous Bag-of-Words} (CBOW) learns $P(c|o)$, i.e. focus word given
+  the context
+\item \ild{Skip-gram} learns $P(o|c)$, i.e. context given some focus word.
+\end{itemize}
+Limitations:
+\begin{itemize}
+\item Any given word is represented by a vector which has to be stored
+\item Polysemy (different meanings of same word) is not adressed at all
+\item Dependence of meaning on context is not considered (gives rise to
+  \ild{context-dependent models})
+\end{itemize}
+
+Given some word embeddings, how do we determine their similarity?
+\begin{itemize}
+\item similarity measures like cosine similarity
+\item visualise by dimension-reduction techniques like t-SNE, PCA, MDS, UMAP,
+  ...
+\end{itemize}
+
+\begin{itemize}
+\item \ild{context-independent models} output a single word vector for a word
+\item \ild{context-dependent models} generate multiple word embeddings for a
+  word that capture different contexts.
+\end{itemize}
+
+\paragraph{\ild{Sentence embedding}} \begin{itemize}
+\item Basic approach with Bag-of-words assumption, vector of tf-idf weights -- Problems:
+  \begin{itemize}
+  \item problem: vectors are large and very sparse
+  \item cosine similarity of sentences with distinct words is zero but there
+    could still be semantic similarity.
+  \end{itemize}
+\item Average word embeddings
+\item Deep learning approaches
+\end{itemize}
+
+\paragraph{\ild{Applications}}
+\begin{itemize}
+\item Assistants like Google, Siri, Alexa, ... for understanding an generating
+  language, answering questions, ...
+\item Opinion mining
+\item Sentiment analysis
+\item Named Entity Recognition
+\end{itemize}
+
+\paragraph{\ild{Limitations}} Language models potentially contain biases
+(ethnic, gender) induced by the training data.
+
+
+
+
+
 
 \pagebreak
 \part{Text Data Mining}
