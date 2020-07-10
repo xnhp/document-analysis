@@ -536,12 +536,55 @@ Given some word embeddings, how do we determine their similarity?
 (ethnic, gender) induced by the training data.
 
 
-
-
-
-
 \pagebreak
 \part{Text Data Mining}
+
+\section{Text classification}
+\paragraph{\textit{Applications}}
+\begin{itemize}
+\item categorise web pages
+\item spam vs. non-spam
+\item categorisation of correspondence
+\item categorisation of news articles
+\item classify to author
+\item classify reviews
+\item easy/hard to read, suitability for age groups
+\item writing style
+\end{itemize}
+
+As always, have a rule-based and a machine learning approach
+
+\paragraph{\ila{Naive Bayes} } \gray{ (for text classification) } Assumes
+bag-of-words (independence between words). For a class $c$ and words $w_i$, find
+the predicted class $y$ by
+\begin{align*}
+  y = \argmax_c P(c) \prod_i P(w_i~|~c)
+\end{align*}
+For individual probabilities use maximum likelihood estimate, i.e.
+\begin{itemize}
+\item $P(c) = \frac{\text{\# of training docs with class $c$}}{\text{ \# all docs }}$
+\item $P(w_i, c) = \frac{\mathit{count}(w_i, c_j)}{\sum_w \mathit{count}(w, c_j)}$
+\end{itemize}
+and the fact that $P(A|B) = \nicefrac{P(A,B)}{P(B)}$
+
+Choice of classification algorithm is dependent in characteristics and amount of
+training data.
+
+\paragraph{\textit{Possible features}}
+\begin{itemize}
+\item tf-idf weights of terms
+\item phrases, characters, $n$-grams
+\item POS-tags
+\item metadata about the document
+\item non-text parts of document
+\end{itemize}
+
+
+
+\section{Text clustering}
+
+\section{Topic modelling}
+
 
 \pagebreak
 \part{Opinion Mining \& Information Extraction}
