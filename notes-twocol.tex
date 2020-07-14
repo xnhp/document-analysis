@@ -13,6 +13,11 @@
 
 \begin{document}
 
+
+{\Huge \vspace{1em}~\\ \textbf{Document Analysis}}
+
+\tableofcontents
+
 \part{Natural Language Processing}
 
 \section{Introduction}
@@ -78,11 +83,10 @@ units, for instance \textit{un-lady-like}, \textit{dog-s}
 
 \paragraph{\textit{Morphemes}}
 \begin{itemize}
-\item \textbf{\ild{Root}} -- equivalence class of a word when all affixes are
-  removed; not further decomposable into meaningful elements.
+\item \textbf{\ild{Root}} -- equivalence class of a word when all affixes (inflectional and derivational) are removed; not further decomposable into meaningful elements. \iln{The root and the suffixes are morphemes.}
 \item \textbf{\ild{Stem}} -- part of word that never changes when
-  morphologically inflected, \iln{ i.e. without affixes describing tense, number,
-  person, ... }
+  morphologically inflected, \iln{ i.e. without affixes describing tense,
+    number, person, ... } --- obtained by removing inflections
 \item \textbf{\ild{Lemma}} -- Base form of word
 \item From \textit{produced}, lemma is \textit{produce} but stem is \textit{produc}
 \end{itemize}
@@ -101,6 +105,7 @@ vocabulary/dictionary item)
 \item compound words
 \item apostrophes, umlauts, etc and other linguistic characteristics
 \item encoding issues like RTL/LTR
+\item URLs, numbers, ...
 \end{itemize}
 
 \paragraph{\ila{Maximum Matching algorithm}} Use a dictionary of known terms.
@@ -109,19 +114,21 @@ not always make sense (\textit{``Theta bled own there''}).
 
 \section{Stemming}
 
-\paragraph{\textit{Stemming/Lemmatization}} reduce tokens to equivalence
+\paragraph{\textit{Goal}} reduce tokens to equivalence
 classes. Usually to gather words that are morphologically different but
 semantically quite similar to the same set, i.e. to improve comparability. 
 
-\paragraph{\ila{Porter Stemmer} } Rules for stripping suffixes. Applicability of
-rules is based on \textit{measure} of a word $w$, which is the number $m$ s.t.
-$w=C(VC)\{m\}V$ where $C,V$ are arbitrary sequences of consontants, vowels,
-resp. --- Indeed reduces the words to their \textit{stems}.
+\paragraph{\ila{Porter Stemmer} } Iteratively removes suffixes of words.
+Applicability of rules is based on \textit{measure} of a word $w$, which is the
+number $m$ s.t. $w=C(VC)\{m\}V$ where $C,V$ are arbitrary sequences of
+consontants, vowels, resp. --- Indeed reduces the words to their \textit{stems}.
 
-\paragraph{\ila{WordNet \textsc{Morphy}} }
+\paragraph{\ila{WordNet \textsc{Morphy}} } (\textit{Lemmatizer})
 \begin{itemize}
 \item Has  •  a sophisticated set of rules about inflections  • exception list
 \item Checks the result of transformation against an extensive dictionary
+\item Dont get stem but lemma! -- Where \textsc{Porter} gives \textit{leav},
+  \textsc{Morphy} gives \textsc{leaf}
 \end{itemize}
 
 \paragraph{\iln{Note}} \textsc{Morphy} reduces to \textit{lemmas}, while
@@ -129,7 +136,7 @@ resp. --- Indeed reduces the words to their \textit{stems}.
 
 \begin{itemize}
 \item \textbf{\ild{Over-stemming}} Two words are reduced to the same root when
-  they should not be
+  they should not be (e.g. \textit{university, universal} are both reduced to \textit{univers})
 \item \textbf{\ild{Under-stemming}} Should be reduced to the same root but are not.
 \end{itemize}
 
@@ -140,7 +147,8 @@ Given some input text and some tags (usually word types such as \textit{noun},
 \textit{verb}, etc.), want to assign tags to tokens. (\textit{Sequence
   classification problem}).
 
-Tagging can help with other procedures such as stemming, NER, parsing, ...
+\paragraph{\textit{Motivation}} Tagging can help with other procedures such as
+stemming, NER, parsing, ...
 
 \paragraph{\ild{Def.}} Can divide words into two different classes
 \begin{itemize}
@@ -183,6 +191,9 @@ context in the sentence.
   -- good to tailor solution to very specific problems
 \end{itemize}
 
+\paragraph{\ila{Backoff Tagger} } Combine different taggers (e.g. higher-order
+first, then lower)
+
 \subsection{Probabilistic tagging}
 
 Consider the definition of \ild{ conditional probability }
@@ -210,14 +221,14 @@ For $k=1$, this yields the \ild{unigram model}, for $k=2$ the \ild{bigram model}
 
 $n$-gram modelling is insufficient because language has \textit{long-distance depenencies}.
 
-\paragraph{\ila{Unigram Tagger} } Assume that a unigram model generates the
-current tagging. 
+\paragraph{\ila{Unigram Tagger} } \gray{ (How probable is each tag for a given word?) }
+Assume that a unigram model generates the current tagging.
 
 Assign a token $w$ its most frequent tag, i.e.
 \begin{align*}
   t(w) := \argmax_t P(t~|~w)
 \end{align*}
-\textit{Improvement}: Use Bayes' formula, i.e. $P(A|B) = \frac{P(B|A)P(B)}{P(B)}$,
+Use Bayes' formula to calculate probabilities, i.e. $P(A|B) = \frac{P(B|A)P(B)}{P(B)}$,
 omitting the quotient:
 \begin{align*}
   t(w) := P(t~|~w) = \argmax_t P(t) \cdot P(w~|~t)
@@ -248,13 +259,21 @@ $c$ is the count of observations)
 % \begin{align*}
 %   \text{previously seen POS-tag} \times \text{current word} \rightarrow 
 % \end{align*}
+% bigram table gives most frequent tag (based on training set)
 
 \paragraph{\textit{\todo}} example
+
+\paragraph{\iln{Note}} These sequence-based taggers/models have the problem that if the
+tag for the preceding word cannot be determined, this influences the performance
+for the current word.
 
 
 \subsection{Rule-based tagging}
 
 Try to incorporate linguistic insight.
+
+\paragraph{\ila{Feature-based tagger} } Only consider features of single word to
+be lagged. Look at word, prefixes, suffixes, capitalisation.
 
 \paragraph{\ila{Brill tagger} }
 \begin{enumerate}
@@ -270,14 +289,14 @@ Try to incorporate linguistic insight.
     improvement, apply it.
   \item Repeat until no further improvement is possible.
   \end{itemize}
-
 \end{enumerate}
 
 
 
 \section{Parsing}
 
-\textit{We try to determine the grammatical structure of a sentence.}
+\textit{We try to determine the grammatical structure of a sentence. There's
+  top-down and bottom-up approaches.}
 
 \paragraph{\ild{Parsing problem}} Identify the parse tree (w.r.t some grammar)
 for a given sentence. \iln{(There may be multiple parse trees, or none.)}
@@ -299,8 +318,8 @@ symbol. Obviously requires context-free grammar \iln{(each set of children has
 \paragraph{\textit{Basic assumption}} Language is made up of \ild{constituents},
 i.e. basic, nested building blocks \iln{(terminals and nonterminals of a formal grammar.)}
 
-\paragraph{\ila{Leftmost derivation}} Always expand the leftmost expandable
-nonterminal.
+\paragraph{\ila{Leftmost derivation}} \gray{(top-down)} Always expand the leftmost expandable
+nonterminal. 
 
 \paragraph{\ila{Shift-reduce parser}} \textit{(bottom-up approach)} Push tokens
 onto stack until top of stack matches the \textit{rhs} of a rule, then reduce
@@ -342,9 +361,11 @@ Note that this finds all possible parse trees.
   the most likely parse tree.
 \end{itemize}
 
-\paragraph{\ild{Lexicalised Parsing}} Extend production rules to be specific to
-terms (e.g. \textit{VP(ate)  $\rightarrow$ VP(ate) PP(with)}). Then, again,
+\paragraph{\ila{Lexicalised Parsing}} Extend production rules to be specific to
+head word of sentenc (e.g. \textit{VP(ate)  $\rightarrow$ VP(ate) PP(with)}). Then, again,
 assign/learn probabilities. \todo Head of sentence
+
+\paragraph{\ila{Shallow Parsing} } Simply break up text into (nested) chunks.
 
 \subsection{Dependency Parsing}
 
@@ -352,7 +373,7 @@ assign/learn probabilities. \todo Head of sentence
 between tokens (such as \textit{determiner, subject, ...}), these form a tree.
 Again, want to find the most likely parse/dependency structure
 
-\paragraph{\ila{Constraint-based Parsing} } Come up with rules describing what a
+\paragraph{\ila{Constraint-based Dependency Parsing} } Come up with rules describing what a
 dependency can possibly look like. Begin with a complete graph of pairwise
 dependencies, then iteratively eliminate dependencies according to rules.
 
@@ -363,6 +384,9 @@ parse $y = F(x)$ is given by
 \begin{align*}
   F(X) = \argmax_y \vec w \cdot \sum_{(h,m)\in y} g(x,h,m)
 \end{align*}
+Advantage: nicely generalisable, can e.g. incorporate semantics of word into
+feature vector.
+\todo examples for features
 
 
 \pagebreak
@@ -370,7 +394,7 @@ parse $y = F(x)$ is given by
 
 \textit{As there are many different expressions for the same semantic concept,
   we want to derive concepts of similarity between words. Further, this is
-  useful in spelling correction.}
+  useful in spelling correction. Focus on phonological and spelling similarity.}
 
 \section{Word similarity}
 
@@ -441,7 +465,8 @@ tf-idf weights of terms. \ild{Distance measure}:
 \begin{itemize}
 \item euclidean distance is not suited because it considers the lengths (norms)
   of vectors, but we only really care about the distribution of terms
-\item hence use \ild{cosine similarity}, which measures the angle between vectors.
+\item hence use \ild{cosine similarity}, which measures the angle between
+  vectors. \todo calculation
 \end{itemize}
 
 
