@@ -93,20 +93,52 @@ units, for instance \textit{un-lady-like}, \textit{dog-s}
 
 
 \section{Tokenization}
- 
-\paragraph{\ild{Token}} an individual occurence of a word (as opposed to a
-vocabulary/dictionary item)
 
-\paragraph{\textit{Challenges}}
 \begin{itemize}
-\item Keep abbreviations, dates, numbers as single tokens
-\item distuingish abbreviations from words
-\item names and phrases (\textit{queen of england}, \textit{TU Wien})
-\item compound words
-\item apostrophes, umlauts, etc and other linguistic characteristics
-\item encoding issues like RTL/LTR
-\item URLs, numbers, ...
+\item \textbf{\ild{Token}} A useful semantic unit of the input text, usually a
+  single occurence of a word.
+\item \textbf{\ild{Tokenization}} Split input (usually text) into sequence of
+  tokens. Enables token/word-level analysis, first step for many other methods.
+\item \textbf{\textit{Challenges}}
+  \begin{itemize}
+  \item Keep abbreviations, dates, numbers as single tokens
+  \item distuingish abbreviations from words
+  \item names and phrases (\textit{queen of england}, \textit{TU Wien})
+  \item compound words
+  \item apostrophes, umlauts, etc and other linguistic characteristics
+  \item encoding issues like RTL/LTR
+  \item URLs, numbers, ...
+  \end{itemize}
 \end{itemize}
+
+
+\paragraph{\ila{Stop word removal}}
+\begin{itemize}
+\item \ild{Stop words} -- very frequent and semantically unimportant words
+\item Can obstruct/hinder analysis by skewing frequency distribution extremely
+  (cf. Zipf's Law)
+\item Methods:
+  \begin{itemize}
+  \item Use predefined dictionairy of stop words
+  \item Sort terms by their collection frequency, then remove top $k$ terms
+    (maybe in combination with dictionairy.)
+  \end{itemize}
+
+\end{itemize}
+
+
+\paragraph{\ild{Data cleaning}} \gray{(in context of text data)} Methods such as
+\begin{itemize}
+\item \textit{stop word removal} -- remove frequent and semantically unimportant
+  words
+\item \textit{prune data} -- remove unneeded, unnecessary, invalid data,
+  metadata, formatting, capitalization, etc...
+\item \textit{clean data} -- fix formatting, encoding, ...
+\item \textit{fix data} -- fix missspelling, incorrect formatting 
+\end{itemize}
+ 
+
+
 
 \paragraph{\ila{Maximum Matching algorithm}} Use a dictionary of known terms.
 Take the longest prefix of the input string that matches a dictionary item. Does
@@ -114,9 +146,10 @@ not always make sense (\textit{``Theta bled own there''}).
 
 \section{Stemming}
 
-\paragraph{\textit{Goal}} reduce tokens to equivalence
-classes. Usually to gather words that are morphologically different but
-semantically quite similar to the same set, i.e. to improve comparability. 
+\paragraph{\textit{Goal}} Map tokens to equivalence classes in order to treat
+different words with very similar semantics as equal (e.g. \textit{runs} and
+\textit{run}). In Stemming, do this by remove all inflectional affixes (tense,
+number, person, ...)
 
 \paragraph{\ila{Porter Stemmer} } Iteratively removes suffixes of words.
 Applicability of rules is based on \textit{measure} of a word $w$, which is the
@@ -147,8 +180,17 @@ Given some input text and some tags (usually word types such as \textit{noun},
 \textit{verb}, etc.), want to assign tags to tokens. (\textit{Sequence
   classification problem}).
 
-\paragraph{\textit{Motivation}} Tagging can help with other procedures such as
-stemming, NER, parsing, ...
+\paragraph{\textit{Use Cases}} 
+\begin{itemize}
+\item Parsing of grammatical structure, e.g. dependency parsing
+\item Spelling correction
+\item Sentiment analysis (e.g. \textit{for the greater good} vs \textit{good
+    movie and great actors})
+\item Named Entitiy Recognition (e.g. dont classify verbs as NEs)
+\item Disambiguation of word senses (e.g. \textit{she saw a bear} vs \textit{the
+  tree will bear fruit})
+\end{itemize}
+
 
 \paragraph{\ild{Def.}} Can divide words into two different classes
 \begin{itemize}
@@ -185,10 +227,19 @@ context in the sentence.
 
 \paragraph{\textbf{Main techniques}}
 \begin{itemize}
-\item \ild{Probabilistic tagging} --- consider lexical frequencies of tag in
-  training data -- good when large training corpora are available
+\item \ild{Probabilistic tagging} --- Assign tag based on probability
+  distributions of tags in manually tagged training data.
+  \begin{itemize}
+  \item Need sufficient amount of training data -- no meaningful result if no
+    example for tag-word combination is in training data.
+  \item Tagging results rely on quality of training data. 
+  \end{itemize}
 \item \ild{Rule-based tagging} --- use rules based on linguistic understanding
-  -- good to tailor solution to very specific problems
+  \begin{itemize}
+  \item rules need to be created manually, need expert-knowledge and time
+  \item need a large number of rules to be effective
+  \item good to tailor solution to very specific problems
+  \end{itemize}
 \end{itemize}
 
 \paragraph{\ila{Backoff Tagger} } Combine different taggers (e.g. higher-order
@@ -196,7 +247,8 @@ first, then lower)
 
 \subsection{Probabilistic tagging}
 
-Consider the definition of \ild{ conditional probability }
+\paragraph{\ild{$n$-gram language models}} Consider the definition of {
+  conditional probability }
 \begin{align*}
   P(A|B) = \frac{P(A,B)}{P(B)} 
 \end{align*}
@@ -228,13 +280,24 @@ Assign a token $w$ its most frequent tag, i.e.
 \begin{align*}
   t(w) := \argmax_t P(t~|~w)
 \end{align*}
-Use Bayes' formula to calculate probabilities, i.e. $P(A|B) = \frac{P(B|A)P(B)}{P(B)}$,
+Use Bayes' formula to calculate probabilities, i.e. $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$,
 omitting the quotient:
 \begin{align*}
   t(w) := P(t~|~w) = \argmax_t P(t) \cdot P(w~|~t)
 \end{align*}
+Considering the estimate the probabilities by their frequency in the training
+set, this can be simplified even further:
+\begin{align*}
+  P(w|t) = \frac{ \mathit{count}(w,t) }{\mathit{count}(t)} \\
+  P(t) = \frac{  \mathit{count}(t)}{n}
+\end{align*}
+where $n$ is the number of words, equal to the number of assigned tags; when
+trying to find the argmax $t$, we dont even have to consider the denominator:
+\begin{align*}
+  P(t|w) \approx P(w|t) \cdot P(t) \\
+  = \frac{\mathit{count(w,t)}}{n} \approx \mathit{count}(w,t)
+\end{align*}
 
-\paragraph{\textit{ \todo }} example
 
 \paragraph{\ila{$n$-gram tagger} } Use information about the previous $n$
 tokens in addition to information about current token. Can have \ild{word-based}
@@ -242,26 +305,28 @@ and \ild{tag-based} (tags are more common, training data covers more ground).
 
 Assume a bigram language model (generating the sequence of POS-tags).
 
-Pick the tag $t_i$ for word $w_i$ that maximises
+Pick the tag $t_i$ for word $w$ that maximises
 \begin{align*}
-  P(t_i ~|~ t_{i-1}) \cdot P(w_i~|~t_{i-1})
+  P(t_i ~|~ t_{i-1}) \cdot P(w~|~t_{i})
 \end{align*}
 
 For finding $P(t_i~|~t_{i-1})$, use the \ild{Maximum Likelihood Estimate} (where
 $c$ is the count of observations)
 \begin{align*}
-  P(t_i | t_{i-1}) \approx \frac{c(w_{i-1}, w_i)}{c(w_{i-1})}
+  P(t_i | t_{i-1}) \approx \frac{\mathit{count}(t_{i-1} \text{ then } t_i)}{\mathit{count}(t_{i-1})} \\
+  P(w | t_i) ~~ \text{same as in unigram model} 
 \end{align*}
-\iln{(Use start and end symbols to be able to calculate probs for first and last
-  words)}
+\begin{itemize}
+\item {(Use start and end symbols to be able to calculate probs for item first
+    and last words)}
+\item Problem: Large memory requirements to store $n$-grams (very sparse data structures)
+\end{itemize}
 
 % For $n=2$, can imagine a twodimensional lookup table:
 % \begin{align*}
 %   \text{previously seen POS-tag} \times \text{current word} \rightarrow 
 % \end{align*}
 % bigram table gives most frequent tag (based on training set)
-
-\paragraph{\textit{\todo}} example
 
 \paragraph{\iln{Note}} These sequence-based taggers/models have the problem that if the
 tag for the preceding word cannot be determined, this influences the performance
@@ -289,14 +354,28 @@ be lagged. Look at word, prefixes, suffixes, capitalisation.
     improvement, apply it.
   \item Repeat until no further improvement is possible.
   \end{itemize}
+  The patches are learned from a training corpus.
 \end{enumerate}
 
 
 
 \section{Parsing}
 
-\textit{We try to determine the grammatical structure of a sentence. There's
-  top-down and bottom-up approaches.}
+We try to determine the grammatical structure of a sentence.
+\begin{itemize}
+\item \textit{Constituency parsing} yields parse tree according to a given
+  formal grammar -- useful when subtrees are interesting (e.g. spelling correction)
+\item \textit{Dependency parsing} only yields pairwise relationships between
+  words -- useful when these are interesting, e.g. we want to identify modifier
+  words (sentiment analysis, question answering)
+\end{itemize}
+
+\begin{itemize}
+\item Top-down approach -- Try to generate sentence
+\item Bottom-up approach -- Try to contract tokens into nonterminals
+\end{itemize}
+
+
 
 \paragraph{\ild{Parsing problem}} Identify the parse tree (w.r.t some grammar)
 for a given sentence. \iln{(There may be multiple parse trees, or none.)}
@@ -305,13 +384,11 @@ for a given sentence. \iln{(There may be multiple parse trees, or none.)}
 symbol. Obviously requires context-free grammar \iln{(each set of children has
   exactly one parent)}
 
-\paragraph{\textit{Motivation}}
-\begin{itemize}
-\item Grammar checking
-\item Question answering
-\item Machine translation
-\item ...
-\end{itemize}
+\paragraph{\textit{Motivation}} Grammar checking, Question answering, Machine
+translation, ...
+
+\paragraph{\ild{Ambiguous grammar}} has more than one \textit{leftmost}
+derivation parse tree.
 
 \subsection{Constituency parsing}
 
@@ -319,7 +396,8 @@ symbol. Obviously requires context-free grammar \iln{(each set of children has
 i.e. basic, nested building blocks \iln{(terminals and nonterminals of a formal grammar.)}
 
 \paragraph{\ila{Leftmost derivation}} \gray{(top-down)} Always expand the leftmost expandable
-nonterminal. 
+nonterminal. Potentially lots of backtracking applied. Always yields unique
+parse tree (if grammar is unambiguous).
 
 \paragraph{\ila{Shift-reduce parser}} \textit{(bottom-up approach)} Push tokens
 onto stack until top of stack matches the \textit{rhs} of a rule, then reduce
@@ -333,6 +411,8 @@ these shapes
 \item $S \rightarrow \varepsilon$
 \end{itemize}
 
+\todo transform grammar into CNF
+
 
 \paragraph{\ila{CYK Parser} } \textit{(dynamic programming, bottom-up)} Assumes
 a grammar in CNF, i.e. \textit{rhs} of rules is two nonterminals or a terminal.
@@ -343,6 +423,13 @@ are the \textit{rhs} of a production rule. The topmost cell produces the entire 
   \includegraphics[width=0.4\linewidth]{cyk-parsing}
 \end{figure}
 Note that this finds all possible parse trees.
+\iln{($\rightarrow$ Assignment 5)}
+\begin{itemize}
+\item Potentially quadratic space complexity
+\item Finds all possible parse trees (and all possible parses for substructures)
+  which might not always be needed.
+\end{itemize}
+
 
 \subsection{Statistical Parsing}
 
@@ -382,11 +469,26 @@ $g(x,h,m)$ to a specific dependency $(h,m)$ in a specific sentence $x$. Try to
 maximise the (weighted) sum of all depenencies in the sentence, i.e. the best
 parse $y = F(x)$ is given by
 \begin{align*}
-  F(X) = \argmax_y \vec w \cdot \sum_{(h,m)\in y} g(x,h,m)
+  F_y(x) = \argmax_y \vec w \cdot \sum_{(h,m)\in y} g(x,h,m)
 \end{align*}
-Advantage: nicely generalisable, can e.g. incorporate semantics of word into
-feature vector.
-\todo examples for features
+where $\vec w$ is a weight vector for components of $g$; for binary features it
+can be derived from a given set of training parses by $\frac{\text{\# matching
+    arcs for $i$} }{\text{\# total arcs} }$. $g_i$ are features/scorings for a
+given input/test sequence.
+\begin{itemize}
+\item Advantage: nicely generalisable, can e.g. incorporate semantics of word
+  into feature vector.
+\item Possible features/scorings:
+  \begin{itemize}
+  \item Dependency is between POS-tags that are likely related, e.g. noun
+    and verb
+  \item Dependency is of short range
+  \end{itemize}
+\end{itemize}
+
+
+\paragraph{\ila{Perceptron algorithm} } As per Assignment 6, this is simply
+accepting the dependency structure with the higher score $F_y(x)$.
 
 
 \pagebreak
@@ -408,9 +510,15 @@ representation based on rules.
 \paragraph{\ild{Spelling similarity}} Mainly want to identify spelling errors
 
 \paragraph{\ila{Levenshtein distance / edit distance}} (\textit{dynamic
-  programming}) We already know this. Extensions: Cost matrices, based for
-example on distance of letters on keyboard.
-
+  programming}) We already know this.
+\begin{itemize}
+\item Advantages: simple, easy to implement, finds all optimal alignments,
+  flexible by employing different selection mechanism in dynamic programming.
+\item Quadratic time and space complexity in its simple implementation
+\item Character-based, does not consider local or sentence-scope context.
+\item Extensions: Cost matrices, based for example on distance of letters on
+  keyboard.
+\end{itemize}
 \paragraph{\ild{Semantic similarity}} 
 \begin{itemize}
 \item \ild{Synonym} -- same meaning. A \ild{synset} is the equivalence class of synonymity.
@@ -469,6 +577,17 @@ tf-idf weights of terms. \ild{Distance measure}:
   vectors. \todo calculation
 \end{itemize}
 
+\paragraph{\ild{Cosine similarity}} Consider the formula for the euclidean dot
+product:
+\begin{align*}
+  a \cdot b = ||a|| ||b|| \cos \theta,
+\end{align*} this yields for two vectors $a$ and $b$
+\begin{align*}
+  \text{sim(a,b)} = \cos \theta := \frac{a \cdot b}{||a|| ||b||} 
+\end{align*}
+where $a \cdot b = a^Tb$ is the dot product, $||a|| = a \cdot a = a^Ta$
+
+
 
 \pagebreak
 \part{Language Modelling}
@@ -477,13 +596,13 @@ tf-idf weights of terms. \ild{Distance measure}:
 \begin{enumerate}
 \item Corpus
 \item high-dimensional vector space
-\item latent space (word embedings)
+\item lower-dimensional latent space (word embeddings)
 \item word relationships
 \end{enumerate}
 
 
-\paragraph{\ild{Word embedding}} Encode some notion of similarity to other words
-in a vector. Motivation: Approaches like WordNet are static and thus
+\paragraph{\ild{Word embedding}} ``Embed'' words in a vector space $V$ s.t. similar
+word-vectors are similar w.r.t some measure in $V$. Motivation: Approaches like WordNet are static and thus
 insufficient. Possible information
 \begin{itemize}
 \item syntactic similarity (\textit{run, ran})
@@ -498,11 +617,12 @@ insufficient. Possible information
 \item cell represents the strengh of association, for example \textit{pointwise
     mutual information}
 \end{itemize}
-This matrix is very sparse. We'd like to find a low-dimensional
-representation of our word vector (word embedding). We project into a
-lower-dimensional space, the so-called \ild{latent space}.
+Basically the word-vectors put next to each other. This matrix is very sparse.
+We'd like to find a low-dimensional representation of our word vector (word
+embedding). We project into a lower-dimensional space, the so-called \ild{latent
+  space}.
 
-\paragraph{\ila{Word2Vec}} \textit{(neural network for learning word vectors,
+\paragraph{\ila{Word2Vec}} \gray{(neural network for learning word vectors,
   context-independent model)}
 Given a training corpus, every word in a fixed vocabulary is represented by a vector.
 \begin{enumerate}
@@ -519,10 +639,14 @@ Given a training corpus, every word in a fixed vocabulary is represented by a ve
 Limitations:
 \begin{itemize}
 \item Any given word is represented by a vector which has to be stored
-\item Polysemy (different meanings of same word) is not adressed at all
+\item Context-independent, outputs always only one vector for a word: Polysemy
+  (different meanings of same word) is not adressed at all
 \item Dependence of meaning on context is not considered (gives rise to
   \ild{context-dependent models})
 \end{itemize}
+
+\paragraph{\ila{\textsc{Bert}} } example for a context-dependent model, based on
+a neural network.
 
 Given some word embeddings, how do we determine their similarity?
 \begin{itemize}
@@ -537,14 +661,19 @@ Given some word embeddings, how do we determine their similarity?
   word that capture different contexts.
 \end{itemize}
 
-\paragraph{\ild{Sentence embedding}} \begin{itemize}
-\item Basic approach with Bag-of-words assumption, vector of tf-idf weights -- Problems:
+\paragraph{\ild{Sentence embedding}} Basic approach with Bag-of-words
+assumption, sentence is represented by vector of tf-idf weights
+\begin{itemize}
+\item Motivation: Meaning of words is often defined by the entire sentence, this
+  takes these larger structures into account
+\item  Problems:
   \begin{itemize}
-  \item problem: vectors are large and very sparse
-  \item cosine similarity of sentences with distinct words is zero but there
-    could still be semantic similarity.
+  \item vectors are large and very sparse
+  \item cosine similiarity depends only on components, i.e. single words.
+    Sentences might have a $\cos \theta$ of $0$ but still be semantically similar.
   \end{itemize}
-\item Average word embeddings
+\item Alternatively, to represent a sentence, use the average of all its word
+  embeddings. Disadvantage: Long sentences have less meaningful average.
 \item Deep learning approaches
 \end{itemize}
 
@@ -577,20 +706,6 @@ Given some word embeddings, how do we determine their similarity?
 \item writing style
 \end{itemize}
 
-As always, have a rule-based and a machine learning approach
-
-\paragraph{\ila{Naive Bayes} } \gray{ (for text classification) } Assumes
-bag-of-words (independence between words). For a class $c$ and words $w_i$, find
-the predicted class $y$ by
-\begin{align*}
-  y = \argmax_c P(c) \prod_i P(w_i~|~c)
-\end{align*}
-For individual probabilities use maximum likelihood estimate, i.e.
-\begin{itemize}
-\item $P(c) = \frac{\text{\# of training docs with class $c$}}{\text{ \# all docs }}$
-\item $P(w_i, c) = \frac{\mathit{count}(w_i, c_j)}{\sum_w \mathit{count}(w, c_j)}$
-\end{itemize}
-and the fact that $P(A|B) = \nicefrac{P(A,B)}{P(B)}$
 
 Choice of classification algorithm is dependent in characteristics and amount of
 training data.
@@ -605,6 +720,25 @@ training data.
 \end{itemize}
 
 
+As always, have a rule-based and a machine learning approach
+
+\paragraph{\ila{Naive Bayes} } \gray{ (for text classification) } Assumes
+bag-of-words (independence between words). For a class $c$ and words $w_i$, find
+the predicted class $y$ by
+\begin{align*}
+  y = \argmax_c P(c) \prod_i P(w_i~|~c)
+\end{align*}
+For individual probabilities use maximum likelihood estimate, i.e.
+\begin{itemize}
+\item $P(c) = \frac{\text{\# of training docs with class $c$}}{\text{ \# all docs }}$
+\item $P(w_i| c) = \frac{\mathit{count}(w_i, c_j)}{\sum_w \mathit{count}(w, c_j)}$
+\end{itemize}
+\textbf{Important:} Use laplace smoothing here, i.e. with $|V|$ being vocabulary size:
+\begin{align*}
+  P(w_i| c) = \frac{\mathit{count}(w_i, c_j) + 1}{\sum_w \mathit{count}(w, c_j) + |V|}
+\end{align*}
+
+
 \section{Text clustering}
 
 \textit{Want to put documents into groups that are similar within and dissimilar
@@ -615,7 +749,26 @@ training data.
 
 \section{Topic modelling}
 
+Possible improvements/preprocessing:
+\begin{itemize}
+\item Only keep nouns (per POS tag)
+\end{itemize}
 
+\paragraph{\ila{Latent Dirichlet Allocation (LDA)} } Try to find distributions that
+characterise topics (distributions over words) that, in some mixture, best
+generate/explain a given document. In other words, assume the document to come
+from a distribution that is a mixture of topic distributions. 
+\begin{itemize}
+\item Need to give a fixed number of topics as parameter
+\item A single keyword can be part of multiple topics (with a specific
+  probability each) because a topic is a distribution over words.
+\item Compared to basic text clustering, topic modelling yields probabilities
+  for mapping document $\mapsto$ topic, clustering (most of the time) yields
+  binary assignment. Clustering via tf-idf vectors only considers word
+  frequencies whereas LDA considers correlations \todo
+\item Disadvantage: Does not consider word order
+\item Should do stop-world removal, lemmatization because these skew the distributions
+\end{itemize}
 
 
 \pagebreak
@@ -623,16 +776,21 @@ training data.
 
 \section{Information Extraction}
 
-to extract  • the entities and  • relationships between such entities (i.e.
-clear, factual information)
+To extract and structure relevant information from unstructured (text) data. In
+other words: the curation of structured representations that are easily
+accessible while maintaining semantic information of original text.
+
+Here, we focus only on factual information (\textit{What year was Francis Bacon
+  born in?}) and not opinions.
 
 \subsection{Named Entity Extraction}
 
-used for  • summarizing text  • answering questions  • integrating into knowlege
-bases  • associating information (e.g. sentiments) to sentiments (e.g. of parts
+Used for  • summarizing text  • answering questions  • integrating into knowlege
+bases  • associating information (e.g. opinions) to sentiments (e.g. of parts
 of printer in question)
 
-Possible types of entities  • location  • time  • person  • ...
+Possible types of entities  • location  • time  • person  • organisation etc.
+which can stand in various relations to each other. 
 
 \paragraph{\textit{Supervised learning models}} Based on labelled training
 sequences (of tokens), train a classifier to predict labels (\textit{Sequence
@@ -673,13 +831,34 @@ Methods to extract information:
 
 semi-supervised learning: extract less common patterns based on training corpus?
 
+\subsection{Entity Relation Extraction}
 
+\section{Opinion Mining}
 
+\subsection{Opinion Mining at Document level}
 
+\subsection{Attribute-based Opinion Analysis}
 
+\subsection{Lexicon construction}
+
+\section{Beyond Sentiment}
 
 \pagebreak
 \part{Question Answering \& Text Summarization}
+
+\section{Question Answering}
+
+\subsection{Information-retrieval-based factoid question answering}
+
+\subsection{Knowledge-based question answering}
+
+\section{Text Summarization for Question Answering}
+
+\subsection{Single-document}
+
+\subsection{Multi-document}
+
+
 
 
 \end{document}
