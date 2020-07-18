@@ -812,8 +812,10 @@ them (e.g. triples of operators \textit{is-a}, \textit{daughter-of}, ...)
 \iln{(Can save these triples in a knowledge base e.g. for question-answering; cf
   \textsc{Rdf}-triples)}.
 
-\paragraph{\textit{Relationship Extraction}} Try to find type of relationship
-between two entities. Possibilities
+\subsection{Entity Relation Extraction}
+
+Try to find type of relationship between two entities (e.g. \textit{X}
+is-daugher-of \textit{Y}). Possibilities:
 \begin{itemize}
 \item Extract \textsc{Rdf} triples from large corpora like Wikipedia
 \item Use (specialised) ontologies / knowledge bases (for ex. medical applications)
@@ -825,23 +827,115 @@ Methods to extract information:
   be more specific relations that only make sense between certain types of
   entities (e.g. \textit{cures(drug, disease)}) -- pros:  • precise  • can be
   tailored to specific domains -- cons:  • low recall  • high effort
-\item supervised,
+\item supervised --- define features and ground-truth tags/labels, then apply any
+  classifier -- pros: high accuracy if enough training data -- cons: does not
+  generalise well
 \item unsupervised machine learning.
 \end{itemize}
 
-semi-supervised learning: extract less common patterns based on training corpus?
 
-\subsection{Entity Relation Extraction}
 
-\section{Opinion Mining}
+\section{Opinion Mining / Sentiment Analysis}
+
+\paragraph{\textit{Applications}}
+\begin{itemize}
+\item Classifying reviews (obtain user review information about a product) --
+  gain information on product, or fix contradicting reviews
+\item In recommender systems (recommend items with similar sentiment)
+\item Identify subjectivity (useful in information extraction)
+\item Actually return opinions when requested (politics, sociology, ...)
+\item Identify opinion holders
+\end{itemize}
+
+\paragraph{\ild{Terminology}}
+\begin{itemize}
+\item \ild{Subjectivity Analysis} -- determine whether statement is subjective
+  or not (done at sentence level)
+\item \ild{Sentiment Analysis} -- classify documents according to their polarity
+  (sentence or document level)
+\item \ild{Opinion Mining} -- extract attributes and opinions
+\end{itemize}
+
+Useful preprocessing steps: Named entity recognition and dependency pasing to
+identify which sentiment modifies relate to which entities in the text. 
 
 \subsection{Opinion Mining at Document level}
 
+
+
+\paragraph{\ile{Example: Sentiment classification}} Consider only presence (not
+counts) of adjectives in text. Tag adjectives if negated. Disregard nouns,
+proper nouns because they should be irrelevant for sentiment polarity.
+
+For instance, we can use our well-known naive bayes for classification
+
+\begin{align*}
+  y = \argmax_c P(c) \cdot \Prod P(w_i|c)
+\end{align*}
+
+
+\paragraph{Basic assumption} Each document focusses on a single object and
+contains opinions from a single opinion holder.
+
+\paragraph{\textit{Problems}} with this approach
+\begin{itemize}
+\item Dont extract \textit{what} the sentiments are about
+\item Might express different sentiments about different aspects of the object.
+\end{itemize}
+
 \subsection{Attribute-based Opinion Analysis}
+
+\begin{enumerate}
+\item POS-tagging
+\item Frequent feature generation -- try to identify features (attributes) in
+  the text (e.g. \textit{zoom})
+\item Prune features
+\item Identify infrequent features by considering the head of opinion phrases to
+  be features
+\item Identify semantic orientation -- using WordNet for each opinion word, then
+  average to obtain orientation for entire sentence
+\end{enumerate}
+Output: Sentences and their Polarity by Feature.
+
+Challenges
+\begin{itemize}
+\item Subtle language
+\item Context-dependent attributes (i.e. \textit{the image is very clear})
+\item Strength of opinion
+\item Figures of speech, thwarted expectations narrative (\textit{it should have
+  been good but it wasn't})
+\end{itemize}
+
 
 \subsection{Lexicon construction}
 
+\paragraph{\ila{Dictionairy-based techniques} }
+\begin{enumerate}
+\item Start from a seed-set of positive (\textit{good}, \textit{nice}, ...) and
+  negative (\textit{bad}, \textit{terrible}, ...) opinion words.
+\item Lookup synsets (synonyms) and antonyms in WordNet.
+\end{enumerate}
+Disadvantage: Does not find context-dependent opinion words (\textit{sharp,
+  small, long, ...})
+
+\paragraph{\ila{Corpus-based techniques} }
+\begin{enumerate}
+\item Start from seed set (like above)
+\item In training corpus, try to find linked adjectives -- linked by e.g.
+  \textit{and}, \textit{which is...}, \textit{not only X but also Y}
+\end{enumerate}
+
+
 \section{Beyond Sentiment}
+
+Identify...
+\begin{itemize}
+\item Emotion
+\item Mood
+\item Interpersonal stances
+\item Personality traits
+\end{itemize}
+
 
 \pagebreak
 \part{Question Answering \& Text Summarization}
